@@ -1,81 +1,119 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { ref } from "vue";
+import Header from "./components/Header.vue";
+import Tasks from "./components/Tasks.vue";
+import AddTask from "./components/AddTask.vue";
+
+const defaultTasks = [
+  {
+    id: "1",
+    text: "Doctors Appointment",
+    day: "March 5th at 2:30pm",
+    reminder: true,
+  },
+  {
+    id: "2",
+    text: "Meeting with boss",
+    day: "March 6th at 1:30pm",
+    reminder: true,
+  },
+  {
+    id: "3",
+    text: "Food shopping",
+    day: "March 7th at 2:00pm",
+    reminder: false,
+  },
+];
+const tasks = ref(defaultTasks);
+const showAddTask = ref(false);
+
+const toggleReminder = (id) => {
+  tasks.value = tasks.value.map((task) =>
+    task.id === id ? { ...task, reminder: !task.reminder } : task
+  );
+};
+
+const toggleAddTask = () => {
+  showAddTask.value = !showAddTask.value;
+};
+
+const addTask = (newTask) => {
+  tasks.value = [...tasks.value, newTask];
+};
+
+const deleteTask = (id) => {
+  tasks.value = tasks.value.filter((task) => task.id !== id);
+};
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="container">
+    <Header
+      @on-click="toggleAddTask"
+      :showAddTask="showAddTask"
+      title="Task Tracker"
+    />
+    <div v-show="showAddTask">
+      <AddTask @add-task="addTask" />
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <p>* Double click to toggle reminder</p>
+    <Tasks
+      @toggle-reminder="toggleReminder"
+      @delete-task="deleteTask"
+      :tasks="tasks"
+    />
+  </div>
 </template>
 
 <style>
-@import './assets/base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
+@import "./assets/base.css";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Poppins", sans-serif;
 }
 
-header {
-  line-height: 1.5;
+::selection {
+  background: transparent;
+}
+::-moz-selection {
+  background: transparent;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.container {
+  max-width: 500px;
+  margin: 30px auto;
+  overflow: auto;
+  min-height: 300px;
+  border: 1px solid steelblue;
+  padding: 30px;
+  border-radius: 5px;
 }
-
-a,
-.green {
+.btn {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+  font-size: 15px;
+  font-family: inherit;
 }
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.btn:focus {
+  outline: none;
 }
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-block {
+  display: block;
+  width: 100%;
 }
 </style>
